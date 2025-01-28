@@ -14,7 +14,7 @@ namespace STEditor.GameProject
 {
     [DataContract]
     public class ProjectTemplate
-    { 
+    {
         [DataMember] public required string ProjectType { get; set; }
         [DataMember] public required string ProjectFile { get; set; }
         [DataMember] public required List<string> Folders { get; set; }
@@ -32,7 +32,7 @@ namespace STEditor.GameProject
         private readonly string _templatePath = @"..\..\STEditor\ProjectTemplates";
         private string _projectName = "NewProject";
         public string ProjectName
-        { 
+        {
             get => _projectName;
             set
             {
@@ -59,7 +59,7 @@ namespace STEditor.GameProject
                 }
             }
         }
-        
+
         private bool _isValid;
         public bool IsValid
         {
@@ -67,7 +67,7 @@ namespace STEditor.GameProject
             set
             {
                 if (_isValid != value)
-                { 
+                {
                     _isValid = value;
                     OnPropertyChanged(nameof(IsValid));
                 }
@@ -119,7 +119,7 @@ namespace STEditor.GameProject
             {
                 ErrorMsg = "Selected project folder already exists and is not empty.";
             }
-            else 
+            else
             {
                 ErrorMsg = string.Empty;
                 IsValid = true;
@@ -146,20 +146,39 @@ namespace STEditor.GameProject
                 {
                     Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), folder)));
                 }
-                var dirInfo = new DirectoryInfo(path + @".strawberry\");
-                dirInfo.Attributes |= FileAttributes.Hidden;
-                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
-                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
 
-                var project = new Project(ProjectName, path);
-                Serializer.ToFile(project, path + "ProjectName" + Project.Extension);
+                var hiddenFolderPath = Path.Combine(path, ".StrawberryThief"); // Get path and name hidden folder
+                if (!Directory.Exists(hiddenFolderPath))
+                {
+                    Directory.CreateDirectory(hiddenFolderPath);
+                }
+
+                Debug.WriteLine($"Directory created: {Directory.Exists(hiddenFolderPath)}");
+
+                var dirInfo = new DirectoryInfo(hiddenFolderPath);
+                dirInfo.Attributes |= FileAttributes.Hidden;
+
+                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
+                File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
+
+                var project = new Project(ProjectName, hiddenFolderPath);
+                Serializer.ToFile(project, Path.Combine(path, $"{ProjectName}" + Project.Extension));
                 return path;
             } 
+            catch (UnauthorizedAccessException uex)
+            {
+                Debug.WriteLine("Access to the directory is denied: " + uex.Message);
+            } 
+            catch (PathTooLongException ptlx)
+            {
+                Debug.WriteLine("The specified path is too long: " + ptlx.Message);
+            } 
             catch (Exception ex)
-            { 
-                Debug.WriteLine(ex.Message); // to do: output errors to log file
-                return string.Empty;
+            {
+                Debug.WriteLine($"An unexpected error occurred: {ex.Message}");
             }
+
+            return string.Empty;
         }
 
         public NewProject()
@@ -180,10 +199,9 @@ namespace STEditor.GameProject
 
                     _projectTemplates.Add(template);
                 }
-                    ValidateProjectPath();
-            } 
-            catch (Exception ex)
-            { 
+                ValidateProjectPath();
+            } catch (Exception ex)
+            {
                 Debug.WriteLine(ex.Message); // to do: output errors to log file
             }
         }

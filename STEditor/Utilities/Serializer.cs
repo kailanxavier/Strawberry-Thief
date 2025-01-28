@@ -44,5 +44,6 @@ namespace STEditor.Utilities
                 }
             }
         }
+        // Serialization lowkey kinda fucked ngl
     }
 }

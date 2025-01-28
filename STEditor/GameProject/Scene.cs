@@ -33,9 +33,5 @@ namespace STEditor.GameProject
             Project = project;
             Name = name;
         }
-        // The serialization of these actually makes no fucking sense
-        // and it will stop the project from being opened from other
-        // machines. However I don't feel like rewriting it right now
-        // so that will be a problem for future me.
     }
 }
