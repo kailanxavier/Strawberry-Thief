@@ -155,14 +155,20 @@ namespace STEditor.GameProject
 
                 Debug.WriteLine($"Directory created: {Directory.Exists(hiddenFolderPath)}");
 
+                // Everything from here until the catches is voodoo
+                // and I have no idea how I got to this solution, but
+                // it works so I am not going to touch it for now.
+
                 var dirInfo = new DirectoryInfo(hiddenFolderPath);
                 dirInfo.Attributes |= FileAttributes.Hidden;
 
                 File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
                 File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
 
-                var project = new Project(ProjectName, hiddenFolderPath);
-                Serializer.ToFile(project, Path.Combine(path, $"{ProjectName}" + Project.Extension));
+                var projectXml = File.ReadAllText(template.ProjectFilePath);
+                projectXml = string.Format(projectXml, ProjectName, ProjectPath);
+                var projectPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
+                File.WriteAllText(projectPath, projectXml);
                 return path;
             } 
             catch (UnauthorizedAccessException uex)
