@@ -18,12 +18,12 @@ namespace STEditor.Utilities
                 using var fs = new FileStream(path, FileMode.Create);
                 var serializer = new DataContractSerializer(typeof(T));
                 serializer.WriteObject(fs, instance);
-            } 
+            }
             catch (Exception ex)
             {
-                {
-                    Debug.WriteLine(ex.Message); // to do: output errors to log file
-                }
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to serialize {instance} to {path}.");
+                throw;
             }
         }
 
@@ -35,13 +35,12 @@ namespace STEditor.Utilities
                 var serializer = new DataContractSerializer(typeof(T));
                 T instance = (T)serializer.ReadObject(fs);
                 return instance;
-            } 
+            }
             catch (Exception ex)
             {
-                {
-                    Debug.WriteLine(ex.Message); // to do: output errors to log file
-                    return default(T);
-                }
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to deserialize {path}.");
+                throw;
             }
         }
     }

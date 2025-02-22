@@ -44,7 +44,7 @@ namespace STEditor
                 Application.Current.Shutdown();
             }
             else
-            { 
+            {
                 Project.Current?.Unload();
                 DataContext = projectBrowser.DataContext;
             }

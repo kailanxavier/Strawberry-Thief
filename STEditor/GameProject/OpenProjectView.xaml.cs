@@ -23,6 +23,14 @@ namespace STEditor.GameProject
         public OpenProjectView()
         {
             InitializeComponent();
+
+            // This checks if a project already exists and selects it automatically
+            Loaded += (s, e) => 
+            {
+                var item = projectsListBox.ItemContainerGenerator
+                .ContainerFromIndex(projectsListBox.SelectedIndex) as ListBoxItem;
+                item?.Focus();
+            };
         }
 
         private void OnOpen_Button_Click(object sender, RoutedEventArgs e)

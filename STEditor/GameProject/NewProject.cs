@@ -170,20 +170,12 @@ namespace STEditor.GameProject
                 var projectPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projectPath, projectXml);
                 return path;
-            } 
-            catch (UnauthorizedAccessException uex)
-            {
-                Debug.WriteLine("Access to the directory is denied: " + uex.Message);
-            } 
-            catch (PathTooLongException ptlx)
-            {
-                Debug.WriteLine("The specified path is too long: " + ptlx.Message);
-            } 
+            }
             catch (Exception ex)
             {
-                Debug.WriteLine($"An unexpected error occurred: {ex.Message}");
+                Debug.WriteLine(ex);
+                Logger.Log(MessageType.Error, $"Failed to create {ProjectName}");
             }
-
             return string.Empty;
         }
 
@@ -206,9 +198,11 @@ namespace STEditor.GameProject
                     _projectTemplates.Add(template);
                 }
                 ValidateProjectPath();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message); // to do: output errors to log file
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to read project templates.");
             }
         }
     }

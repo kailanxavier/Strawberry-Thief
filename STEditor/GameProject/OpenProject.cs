@@ -25,7 +25,7 @@ namespace STEditor.GameProject
 
     [DataContract]
     public class ProjectDataList
-    { 
+    {
         [DataMember] public List<ProjectData> Projects { get; set; }
     }
 
@@ -40,13 +40,13 @@ namespace STEditor.GameProject
         private static void ReadProjectData()
         {
             if (File.Exists(_projectDataPath))
-            { 
+            {
                 var projects = Serializer.FromFile<ProjectDataList>(_projectDataPath).Projects.OrderByDescending(x => x.Date);
                 _projects.Clear();
                 foreach (var project in projects)
                 {
                     if (File.Exists(project.FullPath))
-                    { 
+                    {
                         // This checks if the project and path exists
                         // otherwise the file has been moved or deleted.
 
@@ -59,15 +59,15 @@ namespace STEditor.GameProject
         }
 
         private static void WriteProjectData()
-        { 
+        {
             var projects = _projects.OrderBy(x => x.Date).ToList();
             Serializer.ToFile(new ProjectDataList() { Projects = projects }, _projectDataPath);
         }
 
         public static Project Open(ProjectData data)
-        { 
+        {
             ReadProjectData();
-            var project = _projects.FirstOrDefault(x=>x.FullPath == data.FullPath);
+            var project = _projects.FirstOrDefault(x => x.FullPath == data.FullPath);
             if (project != null)
             {
                 // If it is not null then the project has
@@ -95,11 +95,11 @@ namespace STEditor.GameProject
                 _projectDataPath = $@"{_applicationDataPath}ProjectData.xml";
                 Projects = new ReadOnlyObservableCollection<ProjectData>(_projects);
                 ReadProjectData();
-            } 
+            }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message); 
-                // to do: log errors to log file
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to read project data.");
             }
         }
     }
